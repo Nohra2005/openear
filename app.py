@@ -263,12 +263,16 @@ def chat(message, history, verbose=True):
 
     if verbose:
         print(f"[REFLECT] rejected: {verdict.get('issues')}")
+        print(f"[REFLECT] original draft: {draft}")
     contents.append(types.Content(role="model", parts=[types.Part.from_text(text=draft)]))
     contents.append(types.Content(role="user", parts=[types.Part.from_text(
         text=f"[Internal review, not from the customer] Your reply has these problems: {verdict.get('issues')} "
              "Rewrite it to fix them. Do not mention this review.")]))
     rewrite_config = config.model_copy(update={"tools": None})  # no tools on rewrite, so leads aren't logged twice
-    return run_model(contents, rewrite_config)
+    revised = run_model(contents, rewrite_config)
+    if verbose:
+        print(f"[REFLECT] revised reply: {revised}")
+    return revised
 
 
 # ---------- Reflection ----------
