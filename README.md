@@ -10,6 +10,7 @@ pinned: false
 
 # OpenEar Business Agent (Maguy)
 
+**Live demo:** [huggingface.co/spaces/TatianaNohra/openear-maguy](https://huggingface.co/spaces/TatianaNohra/openear-maguy)
 Maguy is the AI sales assistant of **OpenEar**, a fictional Lebanese online store for open-ear sports headphones.
 She answers questions from the store's own business files, recommends a model based on the customer's sport,
 collects leads, and logs questions she can't answer for the team.
