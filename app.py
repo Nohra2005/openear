@@ -26,11 +26,19 @@ if not api_key:
 client = genai.Client(api_key=api_key)
 MODEL = "gemini-3.5-flash-lite"
 
-# Load the business knowledge the agent is allowed to use
-with open("me/business_summary.txt", encoding="utf-8") as f:
+# Load the business knowledge the agent is allowed to use.
+# Files live in me/ locally; on Hugging Face they can also sit next to app.py.
+def find_file(name):
+    for path in (os.path.join("me", name), name):
+        if os.path.exists(path):
+            return path
+    raise FileNotFoundError(f"{name} not found in me/ or the app folder")
+
+
+with open(find_file("business_summary.txt"), encoding="utf-8") as f:
     summary = f.read()
 
-reader = PdfReader("me/about_business.pdf")
+reader = PdfReader(find_file("about_business.pdf"))
 profile = "\n".join(page.extract_text() or "" for page in reader.pages)
 
 
@@ -294,6 +302,20 @@ def reflect(draft, history, message):
         return json.loads(response.text)
     except (json.JSONDecodeError, TypeError):
         return {"approved": True, "issues": ""}  # if the reviewer fails, don't block the reply
+
+
+# ---------- Hugging Face ZeroGPU compatibility ----------
+# Free Hugging Face Spaces run on ZeroGPU, which requires at least one @spaces.GPU function at startup.
+# Maguy runs entirely on the Gemini API and needs no GPU, so this placeholder only satisfies that check.
+# Locally the `spaces` package isn't installed and this block is skipped.
+try:
+    import spaces
+
+    @spaces.GPU
+    def _zerogpu_placeholder():
+        return None
+except ImportError:
+    pass
 
 
 # ---------- Gradio interface ----------
